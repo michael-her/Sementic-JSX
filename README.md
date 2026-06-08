@@ -4,6 +4,12 @@
 
 **Languages:** [English](README.md) · [한국어](README.ko.md)
 
+### ⚡ TL;DR
+
+1. **The Problem:** Agentic coding has no layer to persist intent. Agents waste 90% of your budget reverse-engineering design decisions from `src/` noise.
+2. **The Solution:** `.sjsx` is a non-compiling, valid JSX contract surface where humans and agents explicitly agree on architecture *before* implementing.
+3. **The Payoff:** Pay once to sketch and lock (`[ ]` → `[x]`). Amortize your token costs and achieve zero-hallucination, language-agnostic code generation.
+
 ---
 
 ## Why it exists
