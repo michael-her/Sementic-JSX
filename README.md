@@ -1,76 +1,75 @@
 # Semantic JSX (.sjsx)
 
-> 컴파일되지 않는 JSX. 인간과 Agent가 합의하는 언어.
+> Non-compiling JSX — a shared language for humans and agents.
+
+**Languages:** [English](README.md) · [한국어](README.ko.md)
 
 ---
 
-## 왜 존재하는가
+## Why it exists
 
-Agentic coding에는 **의도를 저장하는 레이어가 없다.**
+Agentic coding has **no layer for persisting intent.**
 
-코드는 *어떻게*를 담고, 주석은 유실되고, PR description은 검색되지 않는다.
-Agent는 매번 코드를 역산해서 의미를 복원해야 하고, 그 비용은 토큰으로 지불된다.
+Code captures *how*; comments drift; PR descriptions are not searchable. Agents must reverse-engineer meaning from implementation every time — and pay for that in tokens.
 
-`.sjsx`는 이 문제를 다른 방향에서 푼다.
+`.sjsx` takes a different approach:
 
-> 합의된 의도를 **먼저** 기록하고, 구현은 그 다음에.
-
----
-
-## 무엇인가
-
-`.sjsx`는 **유효한 JSX/TS 문법**이지만 빌드 파이프라인에 들어가지 않는다.
-
-- lint는 통과한다 (기존 eslint/tsconfig 설정 그대로)
-- 에디터 syntax highlight, 자동완성 전부 작동한다
-- 실행은 되지 않는다
-- 그것으로 충분하다
+> Record **agreed intent first**; implementation comes second.
 
 ---
 
-## 어휘 레이어
+## What it is
 
-새로운 문법은 없다. 이미 전 세계적으로 합의된 심볼들을 쓴다.
+`.sjsx` files use **valid JSX/TS syntax** but never enter the build pipeline.
 
-| 레이어 | 출처 | 예시 |
+- Passes lint (reuse existing eslint/tsconfig)
+- Full editor syntax highlighting and autocomplete
+- Never executed — and that is enough
+
+---
+
+## Vocabulary layers
+
+No new syntax. Reuse symbols the world already agrees on.
+
+| Layer | Source | Examples |
 |---|---|---|
-| 디자인 | Tailwind | `cx="flex-1 px-6 bg-neutral-950"` |
-| 시스템 | Java/Rust 추상화 | `ThreadPool`, `Result`, `Option` |
+| Design | Tailwind | `cx="flex-1 px-6 bg-neutral-950"` |
+| System | Java/Rust abstractions | `ThreadPool`, `Result`, `Option` |
 | UI/Event | React Native | `View`, `TouchableOpacity`, `onPress` |
-| 상태 | Redux (pre-16) | `Store`, `mapStateToProps`, `dispatch` |
+| State | Redux (pre-16) | `Store`, `mapStateToProps`, `dispatch` |
 
-Agent는 이 심볼들의 의미를 이미 알고 있다.
-인간이 스케치하면 Agent는 공백만 채우면 된다.
+Agents already know these symbols. Humans sketch; agents fill the gaps.
 
 ---
 
-## 합의 루프
+## Agreement loop
 
 ```
-인간: .sjsx 스케치 ([ ] 항목 = 미합의)
+Human: sketch .sjsx ([ ] = not yet agreed)
   ↓
-Agent: 공백 채우기 + 질문
+Agent: fill gaps + ask questions
   ↓
-인간: diff 확인 → [x] 항목으로 변경
+Human: review diff → mark [x] when agreed
   ↓
-합의 완료 → sjsx scaffold → 구현 시작
+Agreement complete → sjsx scaffold → implementation
 ```
 
 ---
 
-## Git이 Semantic History가 된다
+## Git as semantic history
 
-`.sjsx`가 git에 커밋되는 순간:
+Once `.sjsx` is committed:
 
-- `commit` = 의도의 스냅샷
-- `diff` = 설계 결정의 변화
-- `log` = 프로젝트가 *왜* 이렇게 만들어졌는지의 타임라인
+- `commit` = snapshot of intent
+- `diff` = evolution of design decisions
+- `log` = timeline of *why* the project looks the way it does
 
-별도 파이프라인 없이. 사후 처리 없이.
+No extra pipeline. No post-processing.
 
 ---
 
-## 예제
+## Example
 
 ```jsx
 /**
@@ -79,10 +78,10 @@ Agent: 공백 채우기 + 질문
  * layer: system
  * status: design
  *
- * 합의 항목:
- * [x] ThreadPool 설정
- * [x] DB 작업 단위
- * [ ] 에러 핸들링 전략 (retry vs dead-letter?)
+ * Agreement items:
+ * [x] ThreadPool configuration
+ * [x] DB job granularity
+ * [ ] Error handling strategy (retry vs dead-letter?)
  */
 
 const TodoSyncWorker = (
@@ -104,20 +103,20 @@ const TodoSyncWorker = (
 ## CLI
 
 ```bash
-# 설치
+# Install
 npm install -g sjsx
 
-# 합의 현황 확인
+# Agreement status for a directory
 sjsx status ./design
 
-# 미합의 항목 보기
+# Show unagreed items
 sjsx diff todo-system.sjsx
 
-# 구현 scaffold 생성
+# Generate implementation scaffold
 sjsx scaffold todo-system.sjsx
 ```
 
-### `sjsx status` 출력 예시
+### `sjsx status` sample output
 
 ```
 📁  design/
@@ -126,7 +125,7 @@ sjsx scaffold todo-system.sjsx
   todo-ui.sjsx        ████░░░░░░ 40%  (2/5)
 ```
 
-### `sjsx scaffold` 출력 예시
+### `sjsx scaffold` sample output
 
 ```
 📄  todo-ui.sjsx
@@ -134,39 +133,36 @@ sjsx scaffold todo-system.sjsx
     layer  : ui
     status : design
 
-⚠️  미합의 항목 (3개) — scaffold는 생성되나 TODO로 마킹됨:
-    [ ] 빈 상태 UI 디자인
-    [ ] 에러 상태 처리
+⚠️  Unagreed items (3) — scaffold is generated but marked TODO:
+    [ ] Empty-state UI design
+    [ ] Error-state handling
 
-✅  Scaffold 생성: todo-ui.scaffold.ts
+✅  Scaffold written: todo-ui.scaffold.ts
 ```
 
 ---
 
-## 파일 구조 관례
+## File layout convention
 
 ```
 project/
 ├── design/
-│   ├── todo-system.sjsx    ← 시스템 레이어 설계
-│   ├── todo-ui.sjsx        ← UI 레이어 설계
-│   └── todo-ui.scaffold.ts ← 생성된 scaffold
+│   ├── todo-system.sjsx    ← system-layer design
+│   ├── todo-ui.sjsx        ← UI-layer design
+│   └── todo-ui.scaffold.ts ← generated scaffold
 ├── src/
-│   └── ...                 ← 실제 구현
+│   └── ...                 ← implementation
 ```
 
-`design/` 디렉토리는 `.gitignore`에 넣지 않는다.
-그것이 이 프로젝트의 semantic history다.
+Do **not** add `design/` to `.gitignore`. That directory *is* the project's semantic history.
 
 ---
 
-## 핵심 원칙
+## Core principle
 
-> **읽으면 전체가 보여야 한다.**
+> **Reading it should reveal the whole picture.**
 
-Hook은 상태를 컴포넌트 안으로 숨긴다.
-암묵적 사이드이펙트는 흐름을 끊는다.
-`.sjsx`는 그 원칙을 깨는 모든 것을 배제한다.
+Hooks hide state inside components. Implicit side effects break flow. `.sjsx` excludes anything that violates this principle.
 
 ---
 
